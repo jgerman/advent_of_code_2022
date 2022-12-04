@@ -19,3 +19,12 @@ This could be solved more elegantly by passing how to handle the second column
 of the guide in to be used at the last minute instead of where I'm currently
 passing it, but I wanted to wrap up before my lunch break was over. One to
 revisit and refactor to be clean.
+
+
+## Day 3
+
+Did this on day 4. First pass I assumed I'd need the frequencies for some
+reason. Which still got me to the right answer but once I read the second task I
+realized that the only difference was in how the groups of rucksacks to test
+were made. And that's the function that gets passed to the algorithm: group each
+rucksack into compartments, or group every three rucksacks together.
