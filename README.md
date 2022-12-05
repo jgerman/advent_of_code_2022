@@ -28,3 +28,10 @@ reason. Which still got me to the right answer but once I read the second task I
 realized that the only difference was in how the groups of rucksacks to test
 were made. And that's the function that gets passed to the algorithm: group each
 rucksack into compartments, or group every three rucksacks together.
+
+
+## Day 4
+
+Also did this on day 4, got cute with the first check because I assumed the
+ranges would be large and turning them into sets was going to churn, wound up
+re-writing to just use sets once I saw the second task.
