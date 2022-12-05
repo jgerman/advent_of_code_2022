@@ -1,4 +1,4 @@
-(ns jerman.day4
+(ns jgerman.day4
   (:require [jgerman.utils :as utils]
             [clojure.string :as str]
             [clojure.set :as s]))
@@ -50,5 +50,6 @@
 
   (= 4 (task-2 "day4/sample.txt"))
   (= 857 (task-2 "day4/input.txt"))
+
 ;;
   )
