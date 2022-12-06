@@ -35,3 +35,10 @@ rucksack into compartments, or group every three rucksacks together.
 Also did this on day 4, got cute with the first check because I assumed the
 ranges would be large and turning them into sets was going to churn, wound up
 re-writing to just use sets once I saw the second task.
+
+
+## Day 5
+
+Knocked this out on day 6, so still a day behind. A little compulsive
+refactoring to pass the crate-mover model along after the fact but super easy.
+Most of the work is getting the data into a shape I want to work with.
