@@ -42,3 +42,10 @@ re-writing to just use sets once I saw the second task.
 Knocked this out on day 6, so still a day behind. A little compulsive
 refactoring to pass the crate-mover model along after the fact but super easy.
 Most of the work is getting the data into a shape I want to work with.
+
+## Day 6
+
+This was a 5 minute task. A sliding window with a configureable window size
+handled it easily. I made the window configureable from the start guessing that
+that'd be necessary in the second. I swear we had something extremely similar
+last year.
