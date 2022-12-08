@@ -49,3 +49,15 @@ This was a 5 minute task. A sliding window with a configureable window size
 handled it easily. I made the window configureable from the start guessing that
 that'd be necessary in the second. I swear we had something extremely similar
 last year.
+
+## Day 7
+
+Another easy one and another one where a stack makes the solution pretty
+trivial. Rather than build out a tree I only handled directory changes (pushing
+new dirs on the stack with a uuid in case there were nested dirs... which there
+were), and file sizes.
+
+Maintaining a running list of directory sizes by looking at the current
+directory stack was trivial.
+
+Finding the space needed was just arithmetic given the sizes.
