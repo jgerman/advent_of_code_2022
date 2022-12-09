@@ -61,3 +61,13 @@ Maintaining a running list of directory sizes by looking at the current
 directory stack was trivial.
 
 Finding the space needed was just arithmetic given the sizes.
+
+
+## Day 8
+
+I had the idea right, but this is sloppy. Visibility and score are basically the
+same but I just re-implemented the basic flow for score. Additionally I was
+wrong at first because I didn't think to reverse the "before" lists, then a
+second time because I didn't think through my use of take-while. What I really
+wanted was take-until. I discovered halt-when after I solved the problem so that
+bit should be pretty easy to re-write.
