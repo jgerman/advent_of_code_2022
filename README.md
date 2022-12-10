@@ -71,3 +71,16 @@ wrong at first because I didn't think to reverse the "before" lists, then a
 second time because I didn't think through my use of take-while. What I really
 wanted was take-until. I discovered halt-when after I solved the problem so that
 bit should be pretty easy to re-write.
+
+## Day 9
+
+I didn't re-factor this as well as I should have for part 2. I'm not sure
+there's a need to keep the head separate from the 'tails' just applying the move
+to the first position should then passing the whole rope to propogate moves
+would be cleaner.
+
+Again manipulating the input was key. Calculating moves are a lot easier when
+the head moves one step at a time so expanding the input was key.
+
+Small setback on knots higher than 2 for part 2 because I wasn't thinking about
+conj order and was using a list where a vector would give me the order I wanted.

@@ -4,7 +4,6 @@
    [clojure.string :as str]
    [jgerman.utils :as utils]))
 
-
 (defn parse-line [line]
   (let [[dir dist] (str/split line #" ")]
     [dir (utils/str->int dist)]))
@@ -42,33 +41,41 @@
     [tail-x tail-y]
     [(towards head-x tail-x) (towards head-y tail-y)]))
 
-(defn get-visited [lines]
+(defn chase [new-head tails]
+  (loop [chasee new-head
+         chasers tails
+         new-positions []]
+    (if
+     (empty? chasers) new-positions
+     (let [new-chaser (chase-head chasee (first chasers))]
+       (recur new-chaser (rest chasers) (conj new-positions new-chaser))))))
+
+(defn get-visited [lines knot-count]
   (loop [visited #{}
          head-loc [0 0]
-         tail-loc [0 0]
+         tail-locations (vec (repeat (dec knot-count) [0 0]))
          moves lines]
     (let [move (first moves)
           new-head (move-head head-loc move)
-          new-tail (chase-head new-head tail-loc)]
+          new-tails (chase new-head tail-locations)]
       (if (nil? new-head)
         visited
-        (recur (conj visited new-tail) new-head new-tail (rest moves))))))
+        (recur (conj visited (last new-tails)) new-head new-tails (rest moves))))))
 
 (defn task-1 [resource]
   (let [input (-> resource utils/resource->lines expand-input)]
-    (count (get-visited input))))
+    (count (get-visited input 2))))
+
+(defn task-2 [resource]
+  (let [input (-> resource utils/resource->lines expand-input)]
+    (count (get-visited input 10))))
 
 (comment
-  (def sample (-> "day9/sample.txt"
-                  utils/resource->lines))
-
-  (def input (-> "day9/input.txt"
-                 utils/resource->lines))
-
-  (adjacent? [0 0] [0 0])
-  (conj #{[0 0]} [0 0])
-
   (= 13 (task-1 "day9/sample.txt"))
   (= 6464 (task-1 "day9/input.txt"))
+
+  (= 1  (task-2 "day9/sample.txt"))
+  (= 36 (task-2 "day9/sample2.txt"))
+  (= 2604 (task-2 "day9/input.txt"))
   ;;
   )
