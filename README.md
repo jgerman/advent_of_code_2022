@@ -104,3 +104,17 @@ a one pixel difference wasn't a problem in getting the solution in).
 I think I could clean this up to be more readable, especially around variable
 names... I mixed the time var and the pixel vars in a way I probably shouldn't
 have.
+
+
+## Day 11
+
+Brute force worked on task 1. Task 2 failed with an integer overflow, which was
+obviously the trick, how to represent the numbers. Took me a awhile to think
+through but the big clue was all the divisors were primes. If you just tracked
+the remainder for each potential divisor you can keep to low numbers. Should
+work just fine for non-primes too but seeing those primes just pushed me in the
+direction of thinking in "atomic" values.
+
+I'm sure there's a clever way to do it I missed, but I got the answer. Probably
+could use some optimization and task 1 needs to be re-written to work with task
+2 but that should be fairly straight-forward.

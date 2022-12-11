@@ -139,10 +139,10 @@
          (take 2)
          (apply *))))
 
-(defn task-2 [resource]
+(defn task-2 [resource sims]
   (let [results (-> resource
                     prepare-monkeys
-                    (run-sim 20))]
+                    (run-sim sims))]
     (->> results
          (map :inspected-items)
          sort
@@ -152,26 +152,12 @@
 
 
 (comment
-  (def sample (->> "day11/sample.txt"
-                   utils/resource->lines
-                   (partition-by #(= "" %))
-                   (filter #(< 1 (count %)))))
-
-  (def sample-monkeys (prepare-monkeys "day11/sample.txt"))
-
-  (turn sample-monkeys 0)
-  (round sample-monkeys)
-  (run-sim sample-monkeys 20)
+;; task-1 needs to be converted to the non int version of items these won't work
+;; as they stand
   (= 10605 (task-1 "day11/sample.txt"))
   (= 182293 (task-1 "day11/input.txt"))
 
-  (= 2713310158 (task-2 "day11/sample.txt"))
-  (inspect (first sample-monkeys) 79)
-  (throw-to (first sample-monkeys) 620)
-
-  (math/round (/ 1862 3))
-
-  ((:op (first sample-monkeys)) 123)
-  (rest [1 2 3])
+  (= 2713310158 (task-2 "day11/sample.txt" 10000))
+  (= 54832778815 (task-2 "day11/input.txt" 10000))
 ;;
   )
