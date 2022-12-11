@@ -84,3 +84,23 @@ the head moves one step at a time so expanding the input was key.
 
 Small setback on knots higher than 2 for part 2 because I wasn't thinking about
 conj order and was using a list where a vector would give me the order I wanted.
+
+## Day 10
+
+Not a hard one yet. It could probably be more efficient but the answer returns
+immediately so good enough.
+
+I realized I didn't need to track the value at every time t so I just tracked
+the state changes and wrote a lookup function to figure out what X was based on
+that.
+
+For part 2 it took me a second to realize that the fact that the pixels start at
+0 and the cycles at 1 actually makes a difference. Initially I thought they were
+the same. Which lead to the second slow down... I still kept the values linked
+and forgot to mod the lookup at < 40 instead of <= 40. Which actually only
+resulted in a single pixel off which seemed really weird until I saw way (though
+a one pixel difference wasn't a problem in getting the solution in).
+
+I think I could clean this up to be more readable, especially around variable
+names... I mixed the time var and the pixel vars in a way I probably shouldn't
+have.
