@@ -118,3 +118,8 @@ direction of thinking in "atomic" values.
 I'm sure there's a clever way to do it I missed, but I got the answer. Probably
 could use some optimization and task 1 needs to be re-written to work with task
 2 but that should be fairly straight-forward.
+
+First class functions were the hero today. I changed the items from being
+primitive ints to a list of maps and the bulk of the code didn't need changing.
+Each monkey was defined in terms of the math it did when inspecting and the
+predicate it used to choose who it throw to and that all just continued to work.
