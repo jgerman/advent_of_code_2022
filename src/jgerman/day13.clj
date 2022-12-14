@@ -1,6 +1,5 @@
 (ns jgerman.day13
   (:require
-   [clojure.pprint :as pprint]
    [jgerman.utils :as utils]
    [clojure.string :as str]))
 
@@ -12,8 +11,18 @@
               (-> l
                   (str/replace "[" "(")
                   (str/replace "]" ")"))))
-       (map read-string)
+       (map read-string)))
+
+(defn prepare-task-1 [resource]
+  (->> resource
+       prepare-input
        (partition 2)))
+
+(defn prepare-task-2 [resource]
+  (-> resource
+      prepare-input
+      (conj '((2)))
+      (conj '((6)))))
 
 (defn coerce [v]
   (if (coll? v) v (vector v)))
@@ -22,9 +31,9 @@
 
 (defn handle-ints [left right]
   (cond
-    (< left right) :lt
-    (< right left) :gt
-    :else :eq))
+    (< left right) -1
+    (< right left) 1
+    :else 0))
 
 (defn process-elements [left right]
   (cond
@@ -35,30 +44,35 @@
 (defn process-lists [left right]
   (cond
     (and (empty? left)
-         (empty? right)) :eq
-    (empty? left) :lt
-    (empty? right) :gt
+         (empty? right)) 0
+    (empty? left) -1
+    (empty? right) 1
     :else (case (process-elements (first left) (first right))
-            :lt :lt
-            :gt :gt
+            -1 -1
+            1 1
             (process-lists (rest left) (rest right)))))
 
 (defn task-1 [resource]
-  (let [pairs (prepare-input resource)]
+  (let [pairs (prepare-task-1 resource)]
     (->> pairs
          (map-indexed (fn [i x] [(inc i) (apply process-lists x)]))
-         (filter (fn [[_ b]] (= :lt b)))
+         (filter (fn [[_ b]] (= -1 b)))
          (map first)
          (apply +))))
 
+(defn task-2 [resource]
+  (let [data (prepare-task-2 resource)]
+    (let [sorted (->> data
+                      (sort process-lists))]
+      (* (inc (.indexOf sorted '((2))))
+         (inc (.indexOf sorted '((6))))))))
+
 (comment
-  (add-tap (bound-fn* pprint/pprint))
-  (def sample (prepare-input "day13/sample.txt"))
-  (def input (prepare-input "day13/input.txt"))
-
-
   (= 13 (task-1 "day13/sample.txt"))
   (= 5506 (task-1 "day13/input.txt"))
+
+  (= 140 (task-2 "day13/sample.txt"))
+  (= 21756 (task-2 "day13/input.txt"))
 
 
 

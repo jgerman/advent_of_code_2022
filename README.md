@@ -123,3 +123,27 @@ First class functions were the hero today. I changed the items from being
 primitive ints to a list of maps and the bulk of the code didn't need changing.
 Each monkey was defined in terms of the math it did when inspecting and the
 predicate it used to choose who it throw to and that all just continued to work.
+
+
+## Day 12
+
+Work... football... missed it on the day. Was just going to lag a day but looked
+at day 13 and saw how neatly that fit into a clojure solution and knocked that
+out instead.
+
+This does look like a pathing problem but to be continued...
+
+
+## Day 13
+
+As soon as I saw this I knew it was going to be a breeze. The data was already
+nearly EDN, though I did wind up swapping braces for parens for ease of conjing
+a value back onto the front of the list.
+
+The one thing I'm kicking myself for is not realizing that I was implementing a
+comparator from the jump. In the end all I had to do was search and replace the
+keywords I was using with -1, 0, 1 and the process lists could be passed as a
+comparator to sort though... just a few minutes and task 2 was done.
+
+I suppose I could come back to this and implement my own sorting algorithm at
+some point.
