@@ -133,6 +133,14 @@ out instead.
 
 This does look like a pathing problem but to be continued...
 
+Came back to this on day 17, I'm way behind. I took the time to implement my own
+BFS since it's been awhile. It looked like it was super slow until I realized I
+left an errant println in place. Doesn't mean I can't clean it up but that ns
+should be useable from here on out and I didn't go to an external library, which
+would have made this trivial.
+
+Best bet is to come back and clean it up for use next year.
+
 
 ## Day 13
 
