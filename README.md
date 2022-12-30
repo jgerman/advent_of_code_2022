@@ -155,3 +155,13 @@ comparator to sort though... just a few minutes and task 2 was done.
 
 I suppose I could come back to this and implement my own sorting algorithm at
 some point.
+
+## Day 14
+
+Finally got around to doing day 14, it's Dec 30. The way I implemented the first
+task the simulation stops once a grain falls past the lowest floor. That grain
+is not placed.
+
+I could solve the second task but re-implementing the conditions for stopping
+but I think I can tweak things by changing the stop condition, which will
+require placing grains that stop falling.
