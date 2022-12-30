@@ -165,3 +165,9 @@ is not placed.
 I could solve the second task but re-implementing the conditions for stopping
 but I think I can tweak things by changing the stop condition, which will
 require placing grains that stop falling.
+
+So all it took was to add the ability to pass in the stop condition and to place
+sand that reached the max y value. Calculating the answer isn't fast but it
+works.
+
+This is one to come back to for performance reasons.

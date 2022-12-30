@@ -1,6 +1,5 @@
 (ns jgerman.day14
   (:require
-   [clojure.pprint :as pp]
    [clojure.string :as str]
    [jgerman.utils :as utils]))
 
@@ -26,10 +25,6 @@
 
 (defn get-ys [path]
   (map second path))
-
-(defn get-max-x [paths]
-  (let [xs (map get-xs paths)]
-    (apply max (flatten xs))))
 
 (defn get-max-y [paths]
   (let [ys (map get-ys paths)]
@@ -84,13 +79,8 @@
           grid
           points))
 
-(defn shift-rocks-left [rocks shift-amount]
-  (map (fn [[x y]]
-         [(- x shift-amount) y])
-       rocks))
-
-(defn setup-map [rocks]
-  (let [empty-grid (make-grid 525 525)]
+(defn setup-map [rocks x y]
+  (let [empty-grid (make-grid x y)]
     (place-rocks empty-grid rocks)))
 
 (defn max-y [rocks]
@@ -104,14 +94,6 @@
   (let [down       [x (inc y)]
         down-left  [(dec x) (inc y)]
         down-right [(inc x) (inc y)]]
-    #_(tap> {:x x
-           :y y
-           :down down
-           :down-left down-left
-           :down-right down-right
-           :down-value (apply get-val grid down)
-           :down-left-value (apply get-val grid down-left)
-           :down-right-value (apply get-val grid down-right)})
     (cond
       (= "." (apply get-val grid down)) down
       (= "." (apply get-val grid down-left)) down-left
@@ -119,35 +101,45 @@
       :else [x y])))
 
 (defn drop-grain [grid max-y start-location]
-  #_(tap> {:grain-at start-location})
   (let [new-location (step-sand grid start-location)]
     (cond
-      (= max-y (second new-location)) nil
+      (= max-y (second new-location)) (apply set-val grid "o" new-location) ;; i.e. if it is resting on the floor
       (= start-location new-location) (apply set-val grid "o" new-location)
       :else (drop-grain grid max-y new-location))))
 
-(defn drop-sand [grid max-y start-location]
+(defn grain-in-row? [row grid]
+  (let [row-vals (distinct (get grid row))]
+    (some #{"o"} row-vals)))
+
+(defn drop-sand [grid max-y start-location stop-fn]
   (loop [i 0
          g grid]
     (let [new-grid (drop-grain g max-y start-location)]
-      (if (nil? new-grid)
+      (if (stop-fn new-grid)
         i
         (recur (inc i) new-grid)))))
 
 (defn task-1 [resource]
   (let [rocks (->rocks (prepare-input resource))
         max-y (max-y rocks)
-        starting-map (setup-map rocks)]
+        starting-map (setup-map rocks 525 525)]
     (-> starting-map
-        (drop-sand max-y [500 0]))))
+        (drop-sand max-y [500 0] (partial grain-in-row? max-y)))))
+
+(defn task-2 [resource]
+  (let [rocks (->rocks (prepare-input resource))
+        max-y (max-y rocks)
+        starting-map (setup-map rocks 1000 525)]
+    (-> starting-map
+        (drop-sand (inc max-y) [500 0] (partial grain-in-row? 0))
+        inc)))
 
 (comment
-  (add-tap (bound-fn* pp/pprint))
-
-
   (= 24 (task-1 "day14/sample.txt"))
   (= 728 (task-1 "day14/input.txt"))
 
+  (= 93 (task-2 "day14/sample.txt"))
+  (= 27623 (task-2 "day14/input.txt"))
 
 
   ;;
