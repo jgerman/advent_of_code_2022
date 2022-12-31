@@ -1,7 +1,6 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure   {:mvn/version "1.11.1"}
-        instaparse/instaparse {:mvn
-                               /version "1.4.12"}}
+        instaparse/instaparse {:mvn/version "1.4.12"}}
  :aliases
  {:run-m {:main-opts ["-m" "jgerman.advent-of-code-2022"]}
   :run-x {:ns-default jgerman.advent-of-code-2022
