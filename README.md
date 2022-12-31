@@ -171,3 +171,26 @@ sand that reached the max y value. Calculating the answer isn't fast but it
 works.
 
 This is one to come back to for performance reasons.
+
+
+## Day 15
+
+Started this on 12/31/2022. The naive solution (getting the bounded points for
+every beacon and filterin out all those not belonging to the row in question)
+simply takes far too long. There's clearly a trick.
+
+My first optimization was to eliminate all of the input rows that couldn't
+possibly affect the row I was after. That wasn't enough.
+
+Optimization two was to cheat a bit... There aren't many cases where I'd usually
+do this in real code, but I defined a dynamic var that could be set to a row and
+all ranges would be restricted to that row only. I generally prefer to provide
+general-ish solutions but in this case since it was task 1 I wanted to see what
+task two wanted quickly to see if that optimzation would hold up. Looking at
+part two I don't think it will. It might finish but it would certainly be
+several minutes. If it were less than a minute I'd be ok with itbut several
+means there has to be a better way.
+
+I suspect there are interactions between either each beacon, or a beacon and
+other sensors, or some permutation there that's exploitable. Checking in task 1
+and thinking it over a bit...
