@@ -179,6 +179,13 @@ Started this on 12/31/2022. The naive solution (getting the bounded points for
 every beacon and filterin out all those not belonging to the row in question)
 simply takes far too long. There's clearly a trick.
 
+I did decide to use instaparse on this. The input could easily have been
+converted with string operations but having a parser as part of your toolkit is
+valuable imo and it's been awhile since I pulled out instaparse. Even though it
+took a little longer the code is cleaner (imo) than making a bunch of splits and
+substitutions. I may start using it more to make sure I stay fluent with that
+library.
+
 My first optimization was to eliminate all of the input rows that couldn't
 possibly affect the row I was after. That wasn't enough.
 
