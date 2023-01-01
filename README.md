@@ -201,3 +201,14 @@ means there has to be a better way.
 I suspect there are interactions between either each beacon, or a beacon and
 other sensors, or some permutation there that's exploitable. Checking in task 1
 and thinking it over a bit...
+
+Ok, I didn't need anything fancy, just the realization that I could work with
+ranges and if all the ranges overlapped, the single spot a beacon could be would
+not be in that row. I don't know if I solve the general problem or if my
+particular input just happened to not need to care about x-values above or below
+the cutoff, but when I saw there was only one answer looking at all of the input
+I didn't bother filtering those values out.
+
+It's still not quick, a good candidate to come back and look at why. But it's
+not so long that it bothers me to leave it as is. It's also fairly clean and
+consistent across the tasks.

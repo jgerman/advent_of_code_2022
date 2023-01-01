@@ -1,8 +1,6 @@
 (ns jgerman.day15
   (:require [jgerman.utils :as utils]
-            [instaparse.core :as insta]
-            [clojure.math :as math]))
-
+            [instaparse.core :as insta]))
 
 ;; total overkill but it's been so long since I used instaparse and it's so
 ;; valuable when I need it I wanted a refresher
@@ -28,6 +26,7 @@
 (def element-txfm {:sensor (fn [x y] {:sensor (merge x y)})
                    :beacon (fn [x y] {:beacon (merge x y)})})
 
+;; clj-kondo is claiming unresolved var on those insta calls, which is nonsense
 (defn parse-line [line]
   (->> line
        sensor-grammar
@@ -44,80 +43,81 @@
     (+(abs (- x1 x2))
       (abs (- y1 y2)))))
 
-(defn get-corner [point d direction]
-  (reduce (fn [m [k v]]
-            (assoc m k (direction v d)))
-          {}
-          point))
-
-(def ^:dynamic *bounded-y* nil)
-
-(defn ->bounded-points
-  "Takes a point, a manhattan distance d, determines all points that are d away.
-  Essentially all of the points contained in a bounding box d away."
-  [{:keys [x y] :as point} d]
-  (let [upper-left (get-corner point d -)
-        lower-right (get-corner point d +)
-        y-range (if *bounded-y*
-                  *bounded-y*
-                  (range (:y upper-left) (inc (:y lower-right))))]
-    (for [x (range (:x upper-left) (inc (:x lower-right)))
-          y y-range]
-      {:x x
-       :y y})))
-
-(defn ->within-distance [point d]
-  (let [bounded-points (->bounded-points point d)]
-    (filter (fn [p]
-              (<= (manhattan-distance point p) d))
-            bounded-points)))
-
-(defn beacon-exclusion [{:keys [sensor beacon]}]
-  (let [d (manhattan-distance sensor beacon)]
-    (filter (fn [p]
-              (not= p beacon))
-            (->within-distance sensor d))))
-
-(defn beacon-exclusions [data-points]
-  (reduce (fn [s dp]
-            (reduce conj s (beacon-exclusion dp)))
-          #{}
-          data-points))
-
-(defn ->distances [{:keys [sensor beacon] :as data-point}]
+(defn add-distance [{:keys [sensor beacon] :as data-point}]
   (assoc data-point :d (manhattan-distance sensor beacon)))
 
-(defn remove-impossible
-  "Filters out any data point that can't possibly effect a given row."
-  [data-points row]
-  (filter (fn [{:keys [sensor beacon]}]
-            (let [d (manhattan-distance sensor beacon)]
-              (and (<= row (+ (:y sensor) d))
-                   (>= row (- (:y sensor) d)))))
-          data-points))
+(defn x-range
+  "Given a data point (sensor, beacon, distance) and a y value, what is the range
+  of xs?"
+  [y {:keys [sensor d]}]
+  (let [distance-from-center (abs (- y (:y sensor)))]
+    (if (< d distance-from-center)
+      nil
+      [(- (:x sensor) (- d distance-from-center))
+       (+ (:x sensor) (- d distance-from-center))])))
+
+(defn x-ranges
+  "For a set of data points, what are the ranges of x at row y?"
+  [y data-points]
+  (filter identity (map (partial x-range y) data-points)))
+
+(defn ->discrete-xs [x-range]
+  (apply range (update x-range 1 inc)))
+
+(defn data-points->discrete-xs [x-ranges]
+  (apply concat (map ->discrete-xs x-ranges)))
+
+(defn beacons-at-y [y data-points]
+  (->> data-points
+       (map :beacon)
+       (map :y)
+       (filter #(= % y))
+       distinct
+       count))
+
+(defn overlap?
+  "This expects pairs ordered by x."
+  [[_ e1] [s2 _]]
+  (<= s2 (inc e1)))
+
+(defn merge-range [[s1 e1] [s2 e2]]
+  [s1 (max e1 e2)])
+
+(defn merge-ranges [ranges]
+  (loop [stack '()
+         rs (sort ranges)]
+    (cond
+      (nil? (first rs)) stack
+      (empty? stack) (recur (conj stack (first rs)) (rest rs))
+      (not (overlap? (first stack) (first rs))) (recur (conj stack (first rs)) (rest rs))
+      :else (recur (conj (rest stack) (merge-range (first stack) (first rs)))
+                   (rest rs)))))
 
 (defn task-1 [resource row]
-  (with-bindings {#'*bounded-y* [row]}
-    (let [data-points (parse-input resource)
-          potential-points (remove-impossible data-points row)
-          exclusions (beacon-exclusions potential-points)]
-      (count (filter (fn [p]
-                       (= row (:y p)))
-                     exclusions)))))
+  (let [data-points (map add-distance (parse-input resource))
+        points (into #{} (data-points->discrete-xs (x-ranges row data-points)))
+        beacons (beacons-at-y row data-points)]
+    (- (count points) beacons)))
+
+(defn find-missing [[x1 x2] [x3 x4]]
+  (inc (second (sort (list x1 x2 x3 x4)))))
+
+(defn task-2 [resource max-y]
+  (let [data-points (map add-distance (parse-input resource))
+        ranges (map (fn [row]
+                      {:y row :range (merge-ranges (x-ranges row data-points))}) (range 0 max-y))
+        beacon-row (first (filter #(< 1 (count (:range %))) ranges))
+        y-val (:y beacon-row)
+        x-val (apply find-missing (:range beacon-row))]
+    (+ y-val (* x-val 4000000))))
 
 (comment
-  (def sample-text (utils/resource->lines "day15/sample.txt"))
-
-  (def parsed-sample (parse-input "day15/sample.txt"))
-  (def parsed-input (parse-input "day15/input.txt"))
-  (beacon-exclusion (first parsed-sample))
-  (beacon-exclusion {:sensor {:x 8 :y 7} :beacon {:x 2 :y 10}})
-
-  (beacon-exclusions parsed-sample)
-
+  ;; still not super fast for the actual input but good enough
+  ;; and for task 2 we won't take the discrete point approach
   (= 26 (task-1 "day15/sample.txt" 10))
   (= 5461729  (task-1 "day15/input.txt" 2000000))
 
-
+  (= 56000011 (task-2 "day15/sample.txt" 20))
+  (= 10621647166538 (task-2 "day15/input.txt" 4000000))
   ;;
   ,)
