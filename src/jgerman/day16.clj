@@ -1,6 +1,8 @@
 (ns jgerman.day16
-  (:require [instaparse.core :as insta]
-            [jgerman.utils :as utils]))
+  (:require
+   [clojure.set :as s]
+   [instaparse.core :as insta]
+   [jgerman.utils :as utils]))
 
 
 ;; going with instaparse again even though it's overkill
@@ -49,42 +51,89 @@
 
 
 (defn open-pressure [nodes open-valves]
+  #_(tap> {:nodes
+         :open-valves})
   (apply + (map (fn [valve]
                   (:flow-rate (get-valve nodes valve)))
                 open-valves)))
 
+(defn all-open? [nodes open-valves]
+  (= (open-pressure nodes open-valves)
+     (apply + (map :flow-rate nodes))))
+
+;; attempt to add heuristics to prune the tree first just looking at each child
+;; and prioritizing those with the highest non-zero closed valve and assuming
+;; that's always the right move
+(defn ->potential-moves
+  [nodes location open-valves]
+  (let [valve-data (get-valve nodes location)
+        default-children (:tunnels valve-data)
+        children (->> default-children
+                      (map (partial get-valve nodes))
+                      (sort-by :flow-rate)
+                      reverse)
+        open-children (->> children
+                           (filter (fn [open-valve]
+                                     (and (not (some #{(:valve open-valve)} open-valves))
+                                          (< 0 (:flow-rate open-valve))))))]
+    ;; if there are any open children take the biggest
+    (if (< 0 (count open-children))
+      (list (:valve (first open-children)))
+      default-children)))
+
+(defn larger-than-unopened-neighbors? [nodes location open-valves]
+  (let [valve-data (get-valve nodes location)
+        neighbors (:tunnels valve-data)
+        unopened-neighbors (s/difference (set neighbors) open-valves)
+        unopened-flows (map (fn [valve-label]
+                              (:flow-rate (get-valve nodes valve-label))) unopened-neighbors)]
+    (every? (partial >=(:flow-rate valve-data)) unopened-flows)))
+
 (declare get-child-states)
 
-(defn process-state [nodes {:keys [location time-remaining open-valves parent released] :as current-state}]
+(defn process-state [nodes {:keys [location open-valves just-opened? parent step released] :as current-state}]
   (let [valve-data (get-valve nodes location)
-        potential-moves (filter (fn [t] (not= parent t)) (:tunnels valve-data))
+        potential-moves (->potential-moves nodes location open-valves)
         open?  (some #{location} open-valves)]
     (cond
-      (= 0 time-remaining) (assoc current-state
-                                  :children '())
-      (not open?) (assoc current-state
-                         :children
-                         (conj (get-child-states nodes current-state potential-moves)
-                               (process-state nodes (assoc current-state
-                                                           :open-valves (conj open-valves location)
-                                                           :released (+ released (open-pressure nodes (conj open-valves location)))
-                                                           :time-remaining (dec time-remaining)))))
+      (all-open? nodes open-valves) (assoc current-state
+                                           :children '()
+                                           :released (+ released (* (open-pressure nodes open-valves)
+                                                                    (- 30 step))))
+
+      (= 30 step) (assoc current-state
+                         :released (+ released (open-pressure nodes open-valves))
+                         :children '())
+      (and (not open?)
+           (larger-than-unopened-neighbors? nodes location open-valves))
+      (assoc current-state
+             :children
+             (conj '()
+                   (process-state nodes (assoc current-state
+                                               :open-valves (conj open-valves location)
+                                               :pressure (open-pressure nodes (conj open-valves location))
+                                               :just-opened? true
+                                               :released (+ released (open-pressure nodes (conj open-valves location)))
+                                               :step (inc step)))))
       :else
       (assoc current-state
              :children (get-child-states nodes current-state potential-moves)))))
 
-(defn get-child-states [nodes {:keys [location time-remaining open-valves parent released] :as current-state} moves]
+(defn get-child-states [nodes {:keys [location time-remaining open-valves step released] :as current-state} moves]
   (map (fn [child]
          (process-state nodes
                         (assoc current-state
                                :location child
                                :released (+ released (open-pressure nodes open-valves))
-                               :time-remaining (dec time-remaining)
+                               :just-opened? false
+                               :pressure (open-pressure nodes open-valves)
+                               :step (inc step)
                                :parent location)))
        moves))
 (defn build-tree [nodes start-node]
   (let [root {:location start-node
-              :time-remaining 30
+              :step 1
+              :pressure 0
               :released 0
               :open-valves #{}}]
     (process-state nodes root)))
@@ -109,4 +158,15 @@
   (not (some #{"DD"} #{"DD" "AA"}))
 
   (open-pressure sample #{"DD" "BB"})
+
+
+  (->potential-moves sample "DD" #{"DD"})
+
+  (larger-than-unopened-neighbors? sample "AA" #{"II" "BB"})
+  (s/difference #{"DD" "II" "BB"} #{"DD" "II" "BB"})
+  (all-open? sample #{"DD" "BB" "CC" "EE" "HH" "JJ"})
+
+
+
+  ;;
   ,)
